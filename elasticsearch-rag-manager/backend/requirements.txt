@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+elasticsearch[async]
+aiohttp
+aiofiles
+python-dotenv
+PyPDF2 
+python-docx 
+python-pptx
+pymupdf
+semantic-router
+pdfplumber
+unidecode

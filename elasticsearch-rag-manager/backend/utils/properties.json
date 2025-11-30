@@ -1,0 +1,212 @@
+{
+    "metadata_full_text": {
+        "index_name": {
+            "type": "text"
+        },
+        "user": {
+            "type": "keyword"
+        },
+        "purpose": {
+            "type": "text"
+        },
+        "description": {
+            "type": "text"
+        },
+        "index_type": {
+            "type": "keyword"
+        },
+        "creation_date": {
+            "type": "date"
+        },
+        "latest_update": {
+            "type": "date"
+        },
+        "number_of_data": {
+            "type": "integer"
+        },
+        "extraction_method": {
+            "type": "keyword"
+        }
+    },
+    "metadata_full_vector": {
+        "index_name": {
+            "type": "text"
+        },
+        "user": {
+            "type": "keyword"
+        },
+        "purpose": {
+            "type": "text"
+        },
+        "description": {
+            "type": "text"
+        },
+        "index_type": {
+            "type": "keyword"
+        },
+        "creation_date": {
+            "type": "date"
+        },
+        "latest_update": {
+            "type": "date"
+        },
+        "number_of_data": {
+            "type": "integer"
+        },
+        "embedding_model": {
+            "type": "text"
+        },
+        "vector_size": {
+            "type": "integer"
+        }          
+    },
+    "metadata_chunked_pairs": {
+        "index_name": {
+            "type": "text"
+        },
+        "user": {
+            "type": "keyword"
+        },
+        "purpose": {
+            "type": "text"
+        },
+        "description": {
+            "type": "text"
+        },
+        "index_type": {
+            "type": "keyword"
+        },
+        "creation_date": {
+            "type": "date"
+        },
+        "latest_update": {
+            "type": "date"
+        },
+        "number_of_data": {
+            "type": "integer"
+        },
+        "embedding_model": {
+            "type": "text"
+        },
+        "vector_size": {
+            "type": "integer"
+        },
+        "chunk_size": {
+            "type": "integer"
+        },
+        "overlaps": {
+            "type": "float"
+        },
+        "chunking_method": {
+            "type": "keyword"
+        }
+    },
+    "relations": {
+        "similarity": {
+            "type": "float"
+        },
+        "full_vector_index": {
+            "type": "keyword"
+        },
+        "full_text_index": {
+            "type": "keyword"
+        },
+        "similarity_shape": {
+            "type": "keyword"
+        },
+        "recent_update_date": {
+            "type": "date"
+        },
+        "similarity_type": {
+            "type": "keyword"
+        }
+    },
+    "full_text": {
+        "title": {
+            "type": "text"
+        },
+        "pages": {
+            "type": "integer"
+        },
+        "author": {
+            "type": "text"
+        },
+        "published_date": {
+            "type": "date"
+        },
+        "added_date": {
+            "type": "date"
+        },
+        "characters": {
+            "type": "integer"
+        },
+        "description": {
+            "type": "text"
+        },
+        "series_num": {
+            "type": "integer"
+        },
+        "url": {
+            "type": "text"
+        },
+        "source_type": {
+            "type": "keyword"
+        },
+        "text": {
+            "type": "text"
+        },
+        "file_name": {
+            "type": "text"
+        }
+    },
+    "full_vector": {
+        "vector": {
+            "type": "dense_vector",
+            "dims": ""
+        },
+        "added_date": {
+            "type": "date"
+        },
+        "original_full_text_index_name": {
+            "type": "text"
+        },
+        "original_full_text_index_id": {
+            "type": "keyword"
+        },
+        "original_full_text_data_title": {
+            "type": "text"
+        },
+        "original_full_text_data_id": {
+            "type": "keyword"
+        }
+    },
+    "chunked_pairs": {
+        "chunked_text_vector_pairs": {
+            "type": "nested",
+            "properties": {
+                "vector": {
+                    "type": "dense_vector",
+                    "dims": ""
+                },
+                "text": {
+                    "type": "text"
+                }
+            }
+        },        
+        "added_date": {
+            "type": "date"
+        },
+        "original_full_text_index_name": {
+            "type": "text"
+        },
+        "original_full_text_index_id": {
+            "type": "keyword"
+        },
+        "original_full_text_data_title": {
+            "type": "text"
+        },
+        "original_full_text_data_id": {
+            "type": "keyword"
+        }
+    }
+}

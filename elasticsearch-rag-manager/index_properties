@@ -1,0 +1,90 @@
+index metadata
+    index name
+    user 
+    description 
+    Index_type
+    creation date
+    embedding models
+    latest update
+    id
+    number of data
+    matching original index
+    index type id
+    full text preprocessing
+    generated full vector index info
+    generated chunked pairs index info
+
+
+relations
+    similarity
+    full vector index
+    full text index
+    similarity shape
+    recent update date
+    similarity type
+
+
+full_text
+    title
+    pages
+    author
+    published date
+    added date
+    characters
+    description
+    series id
+    url
+    source type
+    text
+    file name
+    id
+
+
+
+full_vector
+    vector
+    original title
+    original id
+    vector shape
+    added date
+
+
+
+chunked_pair
+    chunked vectors
+    chunked texts
+    original title
+    original id
+    vector shape
+    added date
+    chunk size
+    overlaps
+    separator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

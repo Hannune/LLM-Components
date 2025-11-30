@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # Open Interpreter Service
+  open-interpreter:
+    build: ./open-interpreter-service
+    container_name: open-interpreter-service
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_PORT=8001
+    volumes:
+      - ./open-interpreter-service/config.yaml:/app/config.yaml
+      - interpreter-workspace:/workspace
+    networks:
+      - mcp-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # GPT Researcher Service
+  gpt-researcher:
+    build: ./gpt-researcher-service
+    container_name: gpt-researcher-service
+    ports:
+      - "8002:8002"
+    environment:
+      - SERVICE_PORT=8002
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      - researcher-output:/app/output
+    networks:
+      - mcp-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Crawl4AI Service
+  crawl4ai:
+    build: ./crawl4ai-service
+    container_name: crawl4ai-service
+    ports:
+      - "8003:8003"
+    environment:
+      - SERVICE_PORT=8003
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    networks:
+      - mcp-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8003/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    shm_size: '2gb'  # Needed for Playwright browser
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  interpreter-workspace:
+    name: interpreter_workspace
+  researcher-output:
+    name: researcher_output

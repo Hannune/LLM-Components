@@ -1,0 +1,217 @@
+
+Add full text index
+    functions
+        Get list of full text index
+        Get index mappings(properties) from index metadata
+        Get total number of index
+        Add new index
+    data for index metadata for when adding new index
+        index name: 
+        user: 
+        description:
+        Index_type: “full_text”
+        creation date: `datetime.now()`
+        embedding models: []
+        latest update: `datetime.now()`
+        id: `전체 index 개수`
+        number of data: 0
+        matching original index: None
+        index type id: `full text index 개수`
+        full text preprocessing: []
+        generated full vector index info: {}
+        generated chunked pairs index info: {}
+    mappings when adding new index
+        index: full text #n
+            title: str
+            pages: int
+            author: str
+            published date: date
+            added date: date
+            characters: int
+            description: str
+            series id: int
+            url: str
+            source type: str
+            text: str
+            file name: str
+            id: int
+
+
+
+Add full vector index
+    functions
+        Get list of full text index
+        Get embedding models from selected full text index
+        Get list of available embedding models
+        Get total number of index
+        Modify data from index metadata of full text index
+    keys to be modified in index metadata of full text index
+        generated full vector index info
+            length(id): {index name: index_name,
+                user: user,
+                embedding model: model}
+            embedding models
+            {full_vector: embedding model 추가}
+
+    data for index metadata for when adding new index
+        index name:
+        user: 
+        description: 
+        Index_type: “full vector”
+        creation date: `datetime.now()`
+        embedding models: {full_vector: 선택된 모델}
+        latest update: `datetime.now()`
+        id: 전체 index의 개수
+        number of data: 0
+        matching original index: 선택된 full text index
+        index type id: full vectors index 의 개수
+        full text preprocessing: None
+        generated full vector index info: {}
+        generated chunked pairs index info: {}
+    mappings when adding new index
+        index: full vectors #n
+            vector: list
+            original title: str
+            original id: int
+            vector shape: list
+            added date: date
+
+
+Add chunked pairs index
+    functions
+        Get list of full text index
+        Get embedding models from selected full text index
+        Get list of available embedding models
+        Get total number of index
+        Modify data from index metadata of full text index  
+    keys to be modified in index metadata of full text index
+        generated chunked pair index info
+            length(id): {index name: index_name,
+                user: user,
+                embedding model: model,
+                chunk_method:  {}}
+            embedding models
+                {chunked_pairs: embedding model 추가}
+
+    data for index metadata for when adding new index
+        index name:
+        user: 
+        description: 
+        Index_type: “full vector”
+        creation date: `datetime.now()`
+        embedding models: 선택된 모델
+        latest update: `datetime.now()`
+        id: 전체 index의 개수
+        number of data: 0
+        matching original index: 선택된 full text index
+        index type id: full vectors index 의 개수
+        full text preprocessing: None
+    mappings when adding new index
+        chunked vectors
+        chunked texts
+        original title
+        original id
+        vector shape
+        added date
+        chunk size
+        overlaps
+        separator
+
+
+-------------------------------------------------------------
+
+
+Add full text data
+    functions
+        Get list of full text index
+        Get list of data info from selected full text index other than full text
+        Add new data to selected full text index
+    data to be added
+        title: 
+        pages
+        author
+        published date: 
+        added date: `datetime.now()`
+        characters: `추출된 텍스트 측정`
+        description: 
+        series id: 
+        url: 
+        source type: keyword
+        text: `추출된 텍스트`
+        file name: 
+        id: `index내의 데이터의 개수`
+    keys to be modified in index metadata of full text index
+        latest update: `datetime.now()`
+        number of data: += len(added text)
+
+
+Add full vector data
+    functions    
+        Get list of full text index list
+        Get list of available embedding models
+        Get list of text from selected full text index
+        Embbed text using selected embedding model
+    data to be added
+        index: full vectors #n
+            vector
+            original title
+            original id
+            vector shape
+            added date
+    keys to be modified in index metadata of full text index
+        latest update: `datetime.now()`
+        number of data: += len(added text)
+
+
+Add data to chunked pairs index
+    functions    
+        Get list of full text index list
+        Get list of available embedding models
+        Get list of text from selected full text index
+        Embbed text using selected embedding model
+        Chunking method
+        pair chunked text with embedded vector
+    data to be added
+        chunked vectors
+        chunked texts
+        original title
+        original id
+        vector shape
+        added date
+        chunk size
+        overlaps
+        separator
+    keys to be modified in index metadata of full text index
+        latest update: `datetime.now()`
+        number of data: += len(added text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,71 @@
+{
+    "full_text": {
+        "0": {
+            "job_name": "extract_text",
+            "job_description": "Extract text from various type of files",
+            "function": "",
+            "function_input": "uploaded file from streamlit",
+            "function_output": "extracted_text in string format"
+        },
+        "1": {
+            "job_name": "add_to_es",
+            "job_description": "Add extracted text to full text index",
+            "function": "",
+            "function_input": "extracted_text",
+            "function_output": "None"
+        }
+    },
+    "full_vector": {
+        "0": {
+            "job_name": "retrieve_text",
+            "job_description": "get text from full_text index",
+            "function": "",
+            "function_input": "full text index, data title",
+            "function_output": "extracted text from full_text index"
+        },
+        "1": {
+            "job_name": "embed_text",
+            "job_description": "make vector from extracted text using embedding model",
+            "function": "",
+            "function_input": "text from full_text",
+            "function_output": "embedded vector"
+        },
+        "2": {
+            "job_name": "add_to_es",
+            "job_description": "add vector to full vector index",
+            "function": "",
+            "function_input": "vector",
+            "function_output": "none"
+        }
+    },
+    "chunked_pairs": {
+        "0": {
+            "job_name": "retrieve_text",
+            "job_description": "get text from full_text index",
+            "function": "",
+            "function_input": "full text index, data title",
+            "function_output": "extracted text from full_text index"
+        },
+        "1": {
+            "job_name": "chunk_text",
+            "job_description": "chunk text and add metadata to chunked text",
+            "function": "",
+            "function_input": "full_text",
+            "function_output": "chunked text with metadata"
+        },
+        "2": {
+            "job_name": "embed_text",
+            "job_description": "make vector from extracted text using embedding model",
+            "function": "",
+            "function_input": "chunked vectors and with metadata",
+            "function_output": "embedded chunked vectors"
+        },
+        "3": {
+            "job_name": "add_to_es",
+            "job_description": "add vector to full vector index",
+            "function": "",
+            "function_input": "chunked vectors and matching text",
+            "function_output": "none"
+        }
+    }
+}

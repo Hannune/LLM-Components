@@ -1,0 +1,39 @@
+# LLM Components - Root Dependencies
+#
+# This file contains common dependencies shared across components.
+# For component-specific dependencies, see each component's requirements.txt
+
+# =============================================================================
+# Core LLM Integration
+# =============================================================================
+langchain>=0.1.0
+langchain-ollama>=0.0.1
+openai>=1.0.0  # For OpenAI-compatible APIs
+
+# =============================================================================
+# Environment & Configuration
+# =============================================================================
+python-dotenv>=1.0.0
+
+# =============================================================================
+# HTTP & API
+# =============================================================================
+requests>=2.31.0
+fastapi>=0.100.0
+uvicorn>=0.23.0
+
+# =============================================================================
+# Data Processing
+# =============================================================================
+pandas>=2.0.0
+
+# =============================================================================
+# Component-Specific Installation
+# =============================================================================
+# To install a specific component:
+#
+#   cd elasticsearch-rag-manager/backend && pip install -r requirements.txt
+#   cd elasticsearch-rag-manager/frontend && pip install -r requirements.txt
+#   cd local-llm-vlm-experiments && pip install -r requirements.txt
+#   cd mcp-langchain-distributed-tools && pip install -r requirements.txt
+#   cd mcp-agent-services && docker-compose up -d
