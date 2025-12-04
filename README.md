@@ -119,9 +119,16 @@ curl -X POST http://localhost:8001/execute \
 ```
 
 #### 2. gpt-researcher-service
-Deep research capabilities with multi-source aggregation.
+Deep research with **file upload support** - analyze documents or perform web research.
 
 ```bash
+# Research with uploaded files
+curl -X POST http://localhost:8002/research \
+  -F "query=Analyze these documents" \
+  -F "files=@report.pdf" \
+  -F "files=@data.csv"
+
+# Web research
 curl -X POST http://localhost:8002/research \
   -d '{"query": "Latest developments in quantum computing"}'
 ```
@@ -434,8 +441,8 @@ Built with:
 
 ## 🔗 Related Repositories
 
-**Infrastructure**: [local-llm-infrastructure](https://github.com/Hannune/Local-LLM-Infrastructure) - Deploy and manage local LLMs  
-**Applications**: [llm-applications](https://github.com/Hannune/LLM-Applications) - Complete apps using these components
+**Infrastructure**: [local-llm-infrastructure](../local-llm-infrastructure/) - Deploy and manage local LLMs  
+**Applications**: [llm-applications](../llm-applications/) - Complete apps using these components
 
 ---
 

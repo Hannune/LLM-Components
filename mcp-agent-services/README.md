@@ -46,17 +46,19 @@ Run Open Interpreter, GPT Researcher, and Crawl4AI as microservices, all powered
   - `GET /health` - Health check
 
 ### 2. GPT Researcher Service (:8002)
-- **Purpose**: Automated research with file output
+- **Purpose**: Automated research with **file upload support**
 - **Features**:
+  - 📤 **Upload files** for document-based research
   - Deep research on any topic
+  - Session-based file management
   - Generates comprehensive reports
-  - File export capabilities
-  - Local LLM powered
-- **Setup**: Requires cloning from GitHub (see gpt-researcher-service/SETUP.md)
+  - Auto-cleanup of old sessions
+  - Local LLM powered (Ollama)
 - **Endpoints**:
-  - `POST /research` - Start research
-  - `GET /research/{id}` - Get status
-  - `GET /research/{id}/files` - Download files
+  - `POST /research` - Start research (with optional file uploads)
+  - `POST /cleanup` - Manual cleanup
+  - `DELETE /session/{id}` - Delete session
+  - `GET /` - Health check
 
 ### 3. Crawl4AI Service (:8003)
 - **Purpose**: Web scraping with anti-detection

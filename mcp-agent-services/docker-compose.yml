@@ -24,7 +24,7 @@ services:
       retries: 3
       start_period: 10s
 
-  # GPT Researcher Service
+  # GPT Researcher Service (with file upload support)
   gpt-researcher:
     build: ./gpt-researcher-service
     container_name: gpt-researcher-service
@@ -33,15 +33,17 @@ services:
     environment:
       - SERVICE_PORT=8002
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - SESSION_CLEANUP_HOURS=24
     volumes:
       - researcher-output:/app/output
+      - researcher-sessions:/app/sessions  # For uploaded files
     networks:
       - mcp-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/health')"]
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -78,3 +80,5 @@ volumes:
     name: interpreter_workspace
   researcher-output:
     name: researcher_output
+  researcher-sessions:
+    name: researcher_sessions
