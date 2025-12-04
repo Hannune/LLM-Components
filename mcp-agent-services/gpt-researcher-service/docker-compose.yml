@@ -1,0 +1,20 @@
+services:
+  gpt-researcher-wrapper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gpt-researcher-wrapper
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Mount session-files directory to persist files
+      - ./session-files:/app/session-files
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
