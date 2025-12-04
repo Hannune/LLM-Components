@@ -151,6 +151,39 @@ services:
 
 ---
 
+### 📝 [large-text-summarizer](./large-text-summarizer/)
+**Summarize text larger than LLM context windows with smart chunking**
+
+Map-reduce approach for handling documents of any size. Automatically calculates optimal chunk size and performs two-stage summarization.
+
+**Features:**
+- Smart chunking algorithm (ensures combined summaries fit)
+- Two-stage map-reduce summarization
+- Token counting and compression stats
+- Works with any OpenAI-compatible LOCAL LLM
+- Available as Python function or MCP tool
+
+```python
+from summarizer import summarize_large_text
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(model="qwen2.5:7b", base_url="http://localhost:11434")
+
+# Summarize 100K+ token document
+result = summarize_large_text(
+    text=huge_document,
+    llm=llm,
+    max_final_tokens=500
+)
+
+print(result['summary'])
+# Compression: 100,234 → 487 tokens (0.5%)
+```
+
+**Use Case**: Research papers, transcripts, log files, multi-document summarization
+
+---
+
 ## 🏗️ Architecture Patterns
 
 ### Pattern 1: RAG Pipeline
@@ -178,6 +211,21 @@ Image → local-llm-vlm → Description
         elasticsearch-rag-manager → Store
                 ↓
         Searchable Image Database
+```
+
+### Pattern 4: Large Document Summarization
+```
+Large Text (100K+ tokens)
+        ↓
+  large-text-summarizer
+        ↓
+  [📝 Smart Chunking]
+        ↓
+  [⚙️  Map: Summarize chunks]
+        ↓
+  [⚙️  Reduce: Final summary]
+        ↓
+  Concise Summary (500 tokens)
 ```
 
 ## 🚀 Quick Start
@@ -308,6 +356,7 @@ CRAWL4AI_URL=http://localhost:8003
 | local-llm-vlm-experiments | - | - | - | Low | 5 min |
 | mcp-langchain-distributed-tools | - | - | - | Medium | 15 min |
 | mcp-agent-services | ✅ FastAPI | - | ✅ | Medium | 20 min |
+| large-text-summarizer | - | - | - | Low | 5 min |
 
 ## 🛠️ Development
 
@@ -385,8 +434,8 @@ Built with:
 
 ## 🔗 Related Repositories
 
-**Infrastructure**: [local-llm-infrastructure](../local-llm-infrastructure/) - Deploy and manage local LLMs  
-**Applications**: [llm-applications](../llm-applications/) - Complete apps using these components
+**Infrastructure**: [local-llm-infrastructure](https://github.com/Hannune/Local-LLM-Infrastructure) - Deploy and manage local LLMs  
+**Applications**: [llm-applications](https://github.com/Hannune/LLM-Applications) - Complete apps using these components
 
 ---
 
