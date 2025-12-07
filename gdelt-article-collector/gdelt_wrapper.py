@@ -30,7 +30,7 @@ class GDELTCollector:
     ) -> Dict[str, Any]:
         """
         Search GDELT articles with multiple filters
-        
+
         Args:
             keywords: List of keywords to search for (e.g., ["AI", "machine learning"])
             domains: List of domains to filter (e.g., ["bbc.com", "cnn.com"])
@@ -40,57 +40,47 @@ class GDELTCollector:
             themes: List of GDELT themes (e.g., ["ECON", "ENV_CLIMATECHANGE"])
             languages: List of language codes (e.g., ["eng", "kor"])
             max_results: Maximum number of results (default: 250)
-            timespan: Quick timespan option ("1d", "7d", "30d") - overrides dates
+            timespan: Quick timespan option ("24h", "1d", "7d", "30d") - overrides dates
             sort_by: Sort field ("date", "relevance")
-            
+
         Returns:
             Dict with articles (DataFrame), metadata, and stats
         """
-        # Build filter object
-        f = Filters()
-        
-        # Handle timespan shortcuts
-        if timespan:
-            end = datetime.now()
-            if timespan == "1d":
-                start = end - timedelta(days=1)
-            elif timespan == "7d":
-                start = end - timedelta(days=7)
-            elif timespan == "30d":
-                start = end - timedelta(days=30)
-            else:
-                raise ValueError(f"Invalid timespan: {timespan}. Use '1d', '7d', or '30d'")
-            
-            start_date = start.strftime("%Y-%m-%d")
-            end_date = end.strftime("%Y-%m-%d")
-        
-        # Apply filters
+        # Build filter object with keyword parameter
+        filter_kwargs = {}
+
+        # Handle keywords - join multiple keywords
         if keywords:
-            keyword_query = " OR ".join([f'"{kw}"' if " " in kw else kw for kw in keywords])
-            f.keyword = keyword_query
-            
+            keyword_query = " OR ".join(keywords)
+            filter_kwargs['keyword'] = keyword_query
+
+        # Handle timespan using the API's built-in timespan parameter
+        if timespan:
+            filter_kwargs['timespan'] = timespan
+        else:
+            # Use date range if no timespan
+            if start_date:
+                filter_kwargs['start_date'] = start_date
+            if end_date:
+                filter_kwargs['end_date'] = end_date
+
+        # Add other filters
         if domains:
-            f.domain = domains
-            
-        if start_date:
-            f.start_date = start_date
-            
-        if end_date:
-            f.end_date = end_date
-            
+            filter_kwargs['domain'] = domains
         if countries:
-            f.country = countries
-            
+            filter_kwargs['country'] = countries
         if themes:
-            f.theme = themes
-            
+            filter_kwargs['theme'] = themes
         if languages:
-            f.language = languages
-        
+            filter_kwargs['language'] = languages
+
+        # Create Filters object with parameters
+        f = Filters(**filter_kwargs)
+
         # Execute search
         try:
-            articles_df = self.gd.article_search(f, max_results=max_results)
-            
+            articles_df = self.gd.article_search(f)
+
             if articles_df.empty:
                 return {
                     "success": True,
@@ -99,14 +89,18 @@ class GDELTCollector:
                     "filters": self._get_filter_summary(f, timespan),
                     "message": "No articles found with given filters"
                 }
-            
+
             # Sort results
             if sort_by == "date" and "seendate" in articles_df.columns:
                 articles_df = articles_df.sort_values("seendate", ascending=False)
-            
+
+            # Limit results
+            if max_results and len(articles_df) > max_results:
+                articles_df = articles_df.head(max_results)
+
             # Convert to list of dicts
             articles = articles_df.to_dict("records")
-            
+
             return {
                 "success": True,
                 "articles": articles,
@@ -114,7 +108,7 @@ class GDELTCollector:
                 "filters": self._get_filter_summary(f, timespan),
                 "columns": list(articles_df.columns)
             }
-            
+
         except Exception as e:
             return {
                 "success": False,
@@ -135,43 +129,41 @@ class GDELTCollector:
     ) -> Dict[str, Any]:
         """
         Get timeline of article counts over time
-        
+
         Args:
             mode: "ArtList" (article list) or "TimelineVol" (volume over time)
             Other args same as search_articles
-            
+
         Returns:
             Dict with timeline data
         """
-        f = Filters()
-        
-        # Handle timespan
-        if timespan:
-            end = datetime.now()
-            if timespan == "1d":
-                start = end - timedelta(days=1)
-            elif timespan == "7d":
-                start = end - timedelta(days=7)
-            elif timespan == "30d":
-                start = end - timedelta(days=30)
-            
-            start_date = start.strftime("%Y-%m-%d")
-            end_date = end.strftime("%Y-%m-%d")
-        
-        # Apply filters
+        filter_kwargs = {}
+
+        # Handle keywords
         if keywords:
-            keyword_query = " OR ".join([f'"{kw}"' if " " in kw else kw for kw in keywords])
-            f.keyword = keyword_query
+            keyword_query = " OR ".join(keywords)
+            filter_kwargs['keyword'] = keyword_query
+
+        # Handle timespan using the API's built-in timespan parameter
+        if timespan:
+            filter_kwargs['timespan'] = timespan
+        else:
+            # Use date range if no timespan
+            if start_date:
+                filter_kwargs['start_date'] = start_date
+            if end_date:
+                filter_kwargs['end_date'] = end_date
+
+        # Add other filters
         if domains:
-            f.domain = domains
-        if start_date:
-            f.start_date = start_date
-        if end_date:
-            f.end_date = end_date
-        
+            filter_kwargs['domain'] = domains
+
+        # Create Filters object with parameters
+        f = Filters(**filter_kwargs)
+
         try:
             timeline_df = self.gd.timeline_search(mode, f)
-            
+
             if timeline_df.empty:
                 return {
                     "success": True,
@@ -179,9 +171,9 @@ class GDELTCollector:
                     "count": 0,
                     "mode": mode
                 }
-            
+
             timeline = timeline_df.to_dict("records")
-            
+
             return {
                 "success": True,
                 "timeline": timeline,
@@ -189,7 +181,7 @@ class GDELTCollector:
                 "mode": mode,
                 "filters": self._get_filter_summary(f, timespan)
             }
-            
+
         except Exception as e:
             return {
                 "success": False,

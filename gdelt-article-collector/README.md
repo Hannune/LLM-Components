@@ -13,6 +13,22 @@ FastAPI service + MCP tool for searching the [GDELT database](https://www.gdeltp
 - **⚡ FastAPI Service** - REST API with automatic docs
 - **🐳 Docker Ready** - One-command deployment
 
+## ⚠️ Recent Updates (2025-12-07)
+
+The GDELT wrapper has been **completely rewritten** to fix critical API usage issues. If you're upgrading from an older version:
+
+### What Changed
+- **Fixed** incorrect `gdeltdoc` API usage (filters now properly initialized)
+- **Fixed** timespan parameter handling (now uses built-in `"24h"`, `"7d"`, `"30d"`)
+- **Updated** dependencies to resolve version conflicts
+- **Verified** working with real GDELT API calls
+
+### Migration
+If you have existing code:
+1. Update timespan from `"1d"` to `"24h"` (or keep `"7d"`, `"30d"`)
+2. Rebuild Docker image: `docker compose build --no-cache`
+3. Test your queries - they should now return results correctly
+
 ## 📦 Installation
 
 ### Quick Start (Docker)
@@ -21,8 +37,14 @@ FastAPI service + MCP tool for searching the [GDELT database](https://www.gdeltp
 # Clone or copy this directory
 cd gdelt-article-collector
 
-# Start the service
-docker-compose up -d
+# Build and start the service
+docker compose build
+docker compose up -d
+
+# Test the API
+curl -X POST "http://localhost:8004/search" \
+  -H "Content-Type: application/json" \
+  -d '{"keywords": ["finance"], "timespan": "24h", "max_results": 3}'
 
 # Access API docs
 open http://localhost:8004/docs
@@ -186,6 +208,7 @@ Then agents can use:
 | GET | `/themes` | List available GDELT themes |
 | GET | `/countries` | List common country codes |
 | GET | `/health` | Health check |
+| GET | `/docs` | Interactive API documentation (Swagger UI) |
 
 ### Search Parameters
 
@@ -199,7 +222,7 @@ Then agents can use:
 | `themes` | List[str] | GDELT themes | `["ECON", "HEALTH"]` |
 | `languages` | List[str] | Language codes | `["eng", "kor"]` |
 | `max_results` | int | Maximum results (1-1000) | `100` |
-| `timespan` | str | Quick timespan shortcut | `"1d"`, `"7d"`, `"30d"` |
+| `timespan` | str | Quick timespan shortcut | `"24h"`, `"7d"`, `"30d"` |
 
 ### Available Themes
 
@@ -223,15 +246,25 @@ See `/themes` endpoint for full list.
 
 ```
 gdelt-article-collector/
-├── gdelt_wrapper.py      # Core GDELT API wrapper
+├── gdelt_wrapper.py      # Core GDELT API wrapper (UPDATED)
 ├── main.py               # FastAPI service
 ├── mcp_server.py         # MCP tool server
 ├── Dockerfile            # Container definition
 ├── docker-compose.yml    # Service orchestration
-├── requirements.txt      # Dependencies
+├── requirements.txt      # Dependencies (UPDATED)
 ├── examples/             # Usage examples
-└── tests/                # Test suite
+│   ├── simple_search.py  # Basic search example
+│   └── api_usage.py      # API client examples
+├── test_collector.py     # Quick test script
+└── README_UPDATED.md     # Detailed change notes
 ```
+
+### Key Components
+
+- **gdelt_wrapper.py**: Handles all GDELT API interactions using the `gdeltdoc` library
+- **main.py**: FastAPI REST API server with automatic OpenAPI documentation
+- **mcp_server.py**: MCP (Model Context Protocol) server for AI agent integration
+- **examples/**: Working code examples demonstrating different use cases
 
 ## 🔧 Advanced Usage
 
@@ -248,7 +281,7 @@ search_articles(
 # Last 24 hours
 search_articles(
     keywords=["breaking news"],
-    timespan="1d"
+    timespan="24h"
 )
 ```
 
@@ -399,31 +432,68 @@ pytest tests/
 
 ## 🐛 Troubleshooting
 
-### No Results Found
+### Common Issues
 
-- Check if keywords are too specific
-- Try broader time range
+#### 1. "No articles found" or Empty Results
+- **Check timespan format**: Use `"24h"`, `"7d"`, or `"30d"` (NOT `"1d"`)
+- Keywords might be too specific - try broader terms
 - Verify domain names are correct (e.g., "bbc.com" not "www.bbc.com")
 - Check GDELT's data availability for your region/language
 
-### Rate Limiting
+#### 2. Dependency Errors
+If you get `ModuleNotFoundError` or version conflicts:
+```bash
+# Reinstall with correct versions
+pip install -r requirements.txt --upgrade
+
+# Or rebuild Docker
+docker compose build --no-cache
+```
+
+#### 3. API Not Working After Update
+If upgrading from old version:
+```bash
+# Stop old containers
+docker compose down
+
+# Remove old images
+docker rmi gdelt-article-collector-gdelt-collector
+
+# Rebuild fresh
+docker compose build --no-cache
+docker compose up -d
+```
+
+#### 4. Rate Limiting
 
 GDELT API has rate limits. If you hit them:
 - Reduce `max_results`
 - Add delays between requests
 - Use more specific filters to reduce data volume
 
-### Docker Issues
+#### 5. Docker Issues
 
 ```bash
 # Check logs
-docker-compose logs -f
+docker compose logs -f
 
 # Restart service
-docker-compose restart
+docker compose restart
 
 # Rebuild
-docker-compose up --build
+docker compose build --no-cache
+docker compose up -d
+```
+
+#### 6. Test Your Installation
+
+Run the test script to verify everything works:
+```bash
+# Inside Docker container
+docker exec -it gdelt-article-collector python test_collector.py
+
+# Or locally
+python3 test_collector.py
 ```
 
 ## 📝 License
