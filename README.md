@@ -191,6 +191,90 @@ print(result['summary'])
 
 ---
 
+### 📰 [gdelt-article-collector](./gdelt-article-collector/)
+**Real-time global news collection with advanced filtering**
+
+FastAPI service + MCP tool for searching the GDELT database - the world's largest open database of human society. Monitor news from around the globe with filters for keywords, domains, countries, themes, and more.
+
+**Features:**
+- Advanced search (keywords, domains, dates, countries, themes, languages)
+- Timeline analysis for tracking article volume over time
+- CSV export functionality
+- MCP tool integration for AI agents
+- REST API with automatic docs
+- Docker deployment ready
+
+```bash
+# Search AI news from last 7 days
+curl -X POST http://localhost:8004/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "keywords": ["artificial intelligence"],
+    "domains": ["bbc.com", "reuters.com"],
+    "timespan": "7d",
+    "max_results": 50
+  }'
+```
+
+```python
+# Use as MCP tool in LangChain
+from langchain.tools import tool
+
+@tool
+def gdelt_search(query: str) -> str:
+    """Search global news via GDELT"""
+    response = requests.post("http://localhost:8004/search",
+        json={"keywords": [query], "timespan": "7d"})
+    return response.json()
+```
+
+**Use Case**: News monitoring, trend analysis, research data collection, agent tool
+
+---
+
+### 🔗 [n8n-agent-hosting](./n8n-agent-hosting/)
+**Agent-to-Agent (A2A) workflows with n8n for orchestrating multi-agent systems**
+
+Host n8n workflows for agent communication with structured APIs, webhook management, and template deployment. Perfect for coordinating multiple AI agents working together on complex tasks.
+
+**Features:**
+- n8n workflow engine for visual agent orchestration
+- A2A Wrapper API for structured agent communication
+- Template management for deploying workflows programmatically
+- Webhook system for agent-to-agent messaging
+- MCP integration with your LOCAL LLM tools
+- Docker-ready full stack
+
+```bash
+# Submit task to researcher agent via webhook
+curl -X POST http://localhost:8005/agent/task \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_type": "researcher",
+    "task": "Find recent news about quantum computing",
+    "context": {"timespan": "7d"},
+    "callback_url": "http://callback-service/results"
+  }'
+```
+
+```python
+# Multi-agent coordination
+researcher_result = client.submit_agent_task(
+    agent_type="researcher",
+    task="Find quantum computing papers"
+)
+
+analyzer_result = client.submit_agent_task(
+    agent_type="analyzer",
+    task="Analyze these papers",
+    context={"papers": researcher_result['articles']}
+)
+```
+
+**Use Case**: Multi-agent systems, workflow orchestration, agent coordination, A2A communication
+
+---
+
 ## 🏗️ Architecture Patterns
 
 ### Pattern 1: RAG Pipeline
@@ -233,6 +317,32 @@ Large Text (100K+ tokens)
   [⚙️  Reduce: Final summary]
         ↓
   Concise Summary (500 tokens)
+```
+
+### Pattern 5: Multi-Agent A2A Workflow
+```
+User Input → n8n-agent-hosting → Agent Workflow
+                    ↓
+            [Agent 1: Research via GDELT]
+                    ↓
+            [Agent 2: Analysis via LLM]
+                    ↓
+            [Agent 3: Writing/Summary]
+                    ↓
+            Final Result (via webhook callback)
+```
+
+### Pattern 6: News Intelligence Pipeline
+```
+Query → gdelt-article-collector → Articles
+            ↓
+    elasticsearch-rag-manager → Index
+            ↓
+    LOCAL LLM → Analysis
+            ↓
+    n8n-agent-hosting → Distribute to agents
+            ↓
+    Comprehensive Report
 ```
 
 ## 🚀 Quick Start
@@ -353,17 +463,22 @@ ELASTICSEARCH_PASSWORD=changeme
 OPEN_INTERPRETER_URL=http://localhost:8001
 GPT_RESEARCHER_URL=http://localhost:8002
 CRAWL4AI_URL=http://localhost:8003
+GDELT_COLLECTOR_URL=http://localhost:8004
+N8N_A2A_WRAPPER_URL=http://localhost:8005
+N8N_UI_URL=http://localhost:5678
 ```
 
 ## 📊 Component Matrix
 
-| Component | Backend | Frontend | Docker | Complexity | Setup Time |
-|-----------|---------|----------|--------|------------|------------|
-| elasticsearch-rag-manager | ✅ FastAPI | ✅ Streamlit | ✅ | High | 30 min |
-| local-llm-vlm-experiments | - | - | - | Low | 5 min |
-| mcp-langchain-distributed-tools | - | - | - | Medium | 15 min |
-| mcp-agent-services | ✅ FastAPI | - | ✅ | Medium | 20 min |
-| large-text-summarizer | - | - | - | Low | 5 min |
+| Component | Backend | Frontend | Docker | MCP Tool | Complexity | Setup Time |
+|-----------|---------|----------|--------|----------|------------|------------|
+| elasticsearch-rag-manager | ✅ FastAPI | ✅ Streamlit | ✅ | - | High | 30 min |
+| local-llm-vlm-experiments | - | - | - | - | Low | 5 min |
+| mcp-langchain-distributed-tools | - | - | - | ✅ | Medium | 15 min |
+| mcp-agent-services | ✅ FastAPI | - | ✅ | - | Medium | 20 min |
+| large-text-summarizer | - | - | - | ✅ | Low | 5 min |
+| gdelt-article-collector | ✅ FastAPI | - | ✅ | ✅ | Medium | 15 min |
+| n8n-agent-hosting | ✅ FastAPI | ✅ n8n UI | ✅ | - | Medium | 20 min |
 
 ## 🛠️ Development
 
