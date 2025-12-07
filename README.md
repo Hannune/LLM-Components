@@ -232,46 +232,12 @@ def gdelt_search(query: str) -> str:
 
 ---
 
-### 🔗 [n8n-agent-hosting](./n8n-agent-hosting/)
+### 🔗 [n8n-agent-hosting](./n8n-agent-hosting(WIP)/)
 **Agent-to-Agent (A2A) workflows with n8n for orchestrating multi-agent systems**
 
 Host n8n workflows for agent communication with structured APIs, webhook management, and template deployment. Perfect for coordinating multiple AI agents working together on complex tasks.
 
-**Features:**
-- n8n workflow engine for visual agent orchestration
-- A2A Wrapper API for structured agent communication
-- Template management for deploying workflows programmatically
-- Webhook system for agent-to-agent messaging
-- MCP integration with your LOCAL LLM tools
-- Docker-ready full stack
-
-```bash
-# Submit task to researcher agent via webhook
-curl -X POST http://localhost:8005/agent/task \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_type": "researcher",
-    "task": "Find recent news about quantum computing",
-    "context": {"timespan": "7d"},
-    "callback_url": "http://callback-service/results"
-  }'
-```
-
-```python
-# Multi-agent coordination
-researcher_result = client.submit_agent_task(
-    agent_type="researcher",
-    task="Find quantum computing papers"
-)
-
-analyzer_result = client.submit_agent_task(
-    agent_type="analyzer",
-    task="Analyze these papers",
-    context={"papers": researcher_result['articles']}
-)
-```
-
-**Use Case**: Multi-agent systems, workflow orchestration, agent coordination, A2A communication
+**Coming Soon**
 
 ---
 
