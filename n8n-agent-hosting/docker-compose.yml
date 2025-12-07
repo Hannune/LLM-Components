@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-agent-host
+    ports:
+      - "5678:5678"
+    environment:
+      # Basic Configuration
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changeme}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://${N8N_HOST:-localhost}:5678/
+      
+      # Execution Settings
+      - EXECUTIONS_MODE=regular
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+      
+      # Agent-specific settings
+      - N8N_PAYLOAD_SIZE_MAX=64
+      - N8N_METRICS=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+      
+      # Allow access to host services (for MCP tools, etc.)
+      - GENERIC_TIMEZONE=UTC
+      
+    volumes:
+      # Persist workflows and credentials
+      - n8n_data:/home/node/.n8n
+      # Mount template directory for easy workflow import
+      - ./templates:/templates:ro
+      # Custom nodes (if needed)
+      - ./custom-nodes:/home/node/.n8n/custom
+      
+    restart: unless-stopped
+    
+    networks:
+      - agent-network
+    
+    extra_hosts:
+      # Allow n8n to access services on host
+      - "host.docker.internal:host-gateway"
+    
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # A2A Wrapper Service (optional - for structured agent communication)
+  a2a-wrapper:
+    build: ./a2a-wrapper
+    container_name: n8n-a2a-wrapper
+    ports:
+      - "8005:8005"
+    environment:
+      - SERVICE_PORT=8005
+      - N8N_URL=http://n8n:5678
+      - N8N_API_KEY=${N8N_API_KEY:-}
+      - N8N_USER=${N8N_USER:-admin}
+      - N8N_PASSWORD=${N8N_PASSWORD:-changeme}
+    volumes:
+      - ./templates:/templates:ro
+    depends_on:
+      - n8n
+    networks:
+      - agent-network
+    restart: unless-stopped
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  n8n_data:
+    name: n8n_agent_data
