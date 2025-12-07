@@ -10,7 +10,7 @@ import yaml
 from typing import Optional, Dict, Any
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import interpreter
+from interpreter import interpreter
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,18 +27,24 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
 
 config = load_config()
 
-# Configure Open Interpreter
-interpreter.auto_run = config.get('permissions', {}).get('auto_run', False)
-interpreter.safe_mode = config.get('permissions', {}).get('safe_mode', 'ask')
+# Configure Open Interpreter with new API
+permissions = config.get('permissions', {})
+interpreter.auto_run = permissions.get('auto_run', False)
+interpreter.offline = True  # Use local models
 
 # Local LLM configuration
 llm_config = config.get('llm', {})
-interpreter.llm.model = llm_config.get('model', 'ollama/qwen2.5:7b')
-interpreter.llm.api_base = llm_config.get('api_base', 'http://host.docker.internal:11434')
-interpreter.llm.temperature = llm_config.get('temperature', 0.1)
+model_name = llm_config.get('model', 'ollama/qwen2.5:7b')
+api_base = llm_config.get('api_base', 'http://host.docker.internal:11434')
+temperature = llm_config.get('temperature', 0.1)
+
+# Set model configuration
+interpreter.model = model_name
+interpreter.api_base = api_base
+interpreter.temperature = temperature
 
 # Set system message
-system_message = config.get('system_message', 
+system_message = config.get('system_message',
     'You are a helpful AI assistant with access to Python code execution. '
     'Be careful and explain what code you will run before executing.'
 )
@@ -66,8 +72,8 @@ async def health():
     return {
         "status": "healthy",
         "service": "open-interpreter",
-        "model": interpreter.llm.model,
-        "safe_mode": interpreter.safe_mode
+        "model": interpreter.model,
+        "auto_run": interpreter.auto_run
     }
 
 
@@ -136,11 +142,11 @@ async def reset_interpreter():
 async def get_config():
     """Get current configuration."""
     return {
-        "model": interpreter.llm.model,
-        "api_base": interpreter.llm.api_base,
-        "temperature": interpreter.llm.temperature,
+        "model": interpreter.model,
+        "api_base": interpreter.api_base,
+        "temperature": interpreter.temperature,
         "auto_run": interpreter.auto_run,
-        "safe_mode": interpreter.safe_mode
+        "offline": interpreter.offline
     }
 
 
