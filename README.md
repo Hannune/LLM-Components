@@ -556,8 +556,8 @@ Built with:
 
 ## 🔗 Related Repositories
 
-**Infrastructure**: [local-llm-infrastructure](../local-llm-infrastructure/) - Deploy and manage local LLMs  
-**Applications**: [llm-applications](../llm-applications/) - Complete apps using these components
+**Infrastructure**: [local-llm-infrastructure](https://github.com/Hannune/Local-LLM-Infrastructure) - Deploy and manage local LLMs  
+**Applications**: [llm-applications](https://github.com/Hannune/LLM-Applications) - Complete apps using these components
 
 ---
 
