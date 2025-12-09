@@ -18,12 +18,23 @@ FastAPI service + MCP tool for searching the [GDELT database](https://www.gdeltp
 The GDELT wrapper has been **completely rewritten** to fix critical API usage issues. If you're upgrading from an older version:
 
 ### What Changed
-- **Fixed** incorrect `gdeltdoc` API usage (filters now properly initialized)
-- **Fixed** timespan parameter handling (now uses built-in `"24h"`, `"7d"`, `"30d"`)
-- **Updated** dependencies to resolve version conflicts
-- **Verified** working with real GDELT API calls
 
-### Migration
+The main issue with the previous version was incorrect usage of the `gdeltdoc` library. This version has been fixed to:
+
+1. **Correct Filter Initialization**: Using `Filters(**kwargs)` to properly initialize filters
+2. **Proper Timespan Usage**: Using the library's built-in `timespan` parameter (e.g., "24h", "7d", "30d")
+3. **Simplified API Calls**: Removing the incorrect `max_records` parameter in favor of client-side limiting
+4. **Updated Dependencies**: Fixed version conflicts in requirements.txt
+5. **Verified** working with real GDELT API calls
+
+The collector has been tested and verified working with:
+- Finance news search (24h timespan)
+- Multiple keyword queries
+- Domain filtering
+- Country-based filtering
+
+### Migration Guide
+
 If you have existing code:
 1. Update timespan from `"1d"` to `"24h"` (or keep `"7d"`, `"30d"`)
 2. Rebuild Docker image: `docker compose build --no-cache`
@@ -31,7 +42,7 @@ If you have existing code:
 
 ## 📦 Installation
 
-### Quick Start (Docker)
+### Quick Start (Docker - Recommended)
 
 ```bash
 # Clone or copy this directory
@@ -48,6 +59,9 @@ curl -X POST "http://localhost:8004/search" \
 
 # Access API docs
 open http://localhost:8004/docs
+
+# Stop the service
+docker compose down
 ```
 
 ### Local Development
@@ -66,6 +80,8 @@ python mcp_server.py
 ## 🚀 Usage
 
 ### 1. REST API
+
+The service runs on port 8004 and provides comprehensive REST API endpoints.
 
 #### Search Articles
 
@@ -148,8 +164,9 @@ curl http://localhost:8004/countries
 
 ```python
 import requests
+from gdelt_wrapper import GDELTCollector
 
-# Initialize client
+# Method 1: Using API client
 API_URL = "http://localhost:8004"
 
 def search_articles(keywords, timespan="7d", max_results=50):
@@ -162,11 +179,26 @@ def search_articles(keywords, timespan="7d", max_results=50):
 
 # Example: Search tech news
 result = search_articles(["AI", "machine learning"])
-
 print(f"Found {result['count']} articles")
 for article in result['articles'][:5]:
     print(f"- {article['title']}")
     print(f"  {article['url']}")
+
+# Method 2: Using wrapper directly
+collector = GDELTCollector()
+
+result = collector.search_articles(
+    keywords=["finance"],
+    timespan="24h",
+    max_results=3
+)
+
+if result["success"]:
+    for article in result["articles"]:
+        print(f"Title: {article['title']}")
+        print(f"URL: {article['url']}")
+        print(f"Date: {article['seendate']}")
+        print("-" * 50)
 ```
 
 ### 3. MCP Tool (Agent Integration)
@@ -221,8 +253,16 @@ Then agents can use:
 | `countries` | List[str] | Country codes (ISO 3166-1 alpha-2) | `["US", "KR"]` |
 | `themes` | List[str] | GDELT themes | `["ECON", "HEALTH"]` |
 | `languages` | List[str] | Language codes | `["eng", "kor"]` |
-| `max_results` | int | Maximum results (1-1000) | `100` |
+| `max_results` | int | Maximum results (1-1000, default: 250) | `100` |
 | `timespan` | str | Quick timespan shortcut | `"24h"`, `"7d"`, `"30d"` |
+| `sort_by` | str | Sort results by | `"date"`, `"relevance"` |
+
+### Timespan Options
+
+- `"24h"` - Last 24 hours (replaces old `"1d"`)
+- `"7d"` - Last 7 days
+- `"30d"` - Last 30 days
+- Or use custom `start_date` and `end_date` (YYYY-MM-DD format)
 
 ### Available Themes
 
@@ -255,13 +295,12 @@ gdelt-article-collector/
 ├── examples/             # Usage examples
 │   ├── simple_search.py  # Basic search example
 │   └── api_usage.py      # API client examples
-├── test_collector.py     # Quick test script
-└── README_UPDATED.md     # Detailed change notes
+└── test_collector.py     # Quick test script
 ```
 
 ### Key Components
 
-- **gdelt_wrapper.py**: Handles all GDELT API interactions using the `gdeltdoc` library
+- **gdelt_wrapper.py**: Handles all GDELT API interactions using the `gdeltdoc` library with correct filter initialization
 - **main.py**: FastAPI REST API server with automatic OpenAPI documentation
 - **mcp_server.py**: MCP (Model Context Protocol) server for AI agent integration
 - **examples/**: Working code examples demonstrating different use cases
@@ -421,6 +460,12 @@ pip install pytest pytest-asyncio httpx
 
 # Run tests
 pytest tests/
+
+# Or run the quick test script
+python test_collector.py
+
+# Inside Docker container
+docker exec -it gdelt-article-collector python test_collector.py
 ```
 
 ### Adding New Features
@@ -429,6 +474,12 @@ pytest tests/
 2. Add endpoint in `main.py`
 3. Add MCP tool in `mcp_server.py` (if needed)
 4. Update README with examples
+
+### Files Modified in Latest Update
+
+1. `gdelt_wrapper.py` - Fixed filter initialization and API usage
+2. `requirements.txt` - Updated dependency versions to resolve conflicts
+3. `examples/` - Added working example scripts
 
 ## 🐛 Troubleshooting
 
@@ -495,6 +546,15 @@ docker exec -it gdelt-article-collector python test_collector.py
 # Or locally
 python3 test_collector.py
 ```
+
+## 📦 Dependencies
+
+Core dependencies:
+- `gdeltdoc==1.5` - GDELT document search library
+- `pandas>=2.0.0` - Data manipulation
+- `fastapi>=0.115.0` - REST API framework
+- `uvicorn>=0.30.0` - ASGI server
+- `pydantic>=2.7.2` - Data validation
 
 ## 📝 License
 
